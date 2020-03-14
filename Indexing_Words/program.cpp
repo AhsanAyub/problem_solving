@@ -1,7 +1,4 @@
 /*
- * The file consists of a number of lines, separated by line breaks.
- * Each line contains "words" made up of lower case alphabetical characters separated by white space.
- * You can assume that the file is small enough to fit in working memory.
  *
  * @author Md. Ahsan Ayub
  * @version 1.0 11/27/2019 
@@ -17,12 +14,13 @@
 
 using namespace std;
 
-const int iUniqueWord = 1000; // A bad way, but for the sake of implementation in short time
+//const int iUniqueWord = 1000; // A bad way, but for the sake of implementation in short time
 
 // This is the vector variable that will store every info
-vector<string> verbose[iUniqueWord];
+//vector<string> verbose[iUniqueWord];
 //vector<vector<int>> verbose;
-
+vector<string> vWords;
+int iUniqueWord = 0; // Counter for unique words
 
 // This is the utility function to print the vector
 void printVector()
@@ -32,15 +30,35 @@ void printVector()
 		The parent loop will first be limited to the size of the word list
 		The child loop will be limited to the size of the line count list
 	*/
+	cout << "Printing the vector...\n";
+	int iVectorSize = vWords.size();
+	for (int i = 0; i < iVectorSize; i++)
+		cout << vWords.at(i) << endl;
 }
 
 // This is the utility function to check the word and return the index in the vector
-int isAppearBefore(string str)
+int isAppearedBefore(string sItem)
 {
 	// Iterate through the vector to search the value in the vector
-	// Return the index if found; otherwise return 0
+	// Return the index if found; otherwise return -1
 
-	return 0;
+	int iVectorSize = vWords.size();
+	int index = 0;
+	while(index < iVectorSize)
+	{
+		if(sItem.compare(vWords.at(index)) == 0)
+		{
+			//cout << "*" << sItem << "* is already found at the vector" << endl;
+			break; // Appeared before!
+		}
+
+		index++;
+	}
+
+	if(index == iVectorSize || iVectorSize == 0)
+		return -1; // Not appeared
+	else
+		return index; // Appeared on index
 }
 
 // This is a utility function to create an adjancency list
@@ -48,14 +66,15 @@ void addLineCount(string str, int i)
 {
 
 	// check whether the word is unique or appeared before in the vector
-	int iCounter = isAppearBefore(str);
+	int iCounter = isAppearedBefore(str);
 
 	cout << str << " " << i << endl;
 
+	/*
 	if(!iCounter)
 		verbose[i].push_back(str); // Insert a new word with the occured line
 	
-	/*
+	
 	else
 		verbose will add the line count in the index returned from the function
 	*/
@@ -69,7 +88,6 @@ void addLineCount(string str, int i)
 
 }
 
-
 // Parse words given a line found in the file
 int parseWords(string str, int iLine)
 {
@@ -80,11 +98,18 @@ int parseWords(string str, int iLine)
 	{
 		if(x == ' ')
 		{
-			//cout << sWord << endl;
-
 			// Store the word and the line number to the vector as adjacency list
-			addLineCount(sWord, (iLine + 1));
-
+			//addLineCount(sWord, (iLine + 1));
+			int iFlag = isAppearedBefore(sWord);
+			if(iFlag == -1)
+			{
+				vWords.push_back(sWord);
+				iUniqueWord += 1;
+			}
+			else
+			{
+				cout << sWord << " appeared on index: " << iFlag << endl;
+			}
 			sWord = "";
 			iWord = iWord + 1;
 		}
@@ -93,7 +118,6 @@ int parseWords(string str, int iLine)
 			sWord = sWord + x;
 		}
 	}
-	
 	return (iWord+1);
 }
 
@@ -118,8 +142,9 @@ int main (int argc, char *argv[])
 
     string line; // this variable is responsible to access each line
  
-    int iLine = 0; // Counter for line
-    int iWord = 0; // Counter for word
+    int iLine = 0; // Counter for lines
+    int iWord = 0; // Counter for words
+
     while(getline(infile, line)) //scan per line
 	{
 		//cout << line << endl;
@@ -129,16 +154,17 @@ int main (int argc, char *argv[])
 		
     	iLine = iLine + 1;
     }
-    //cout << iWord << iLine << endl;
-
     infile.close(); // close the file that was accessed below
-   	
-   	// By now everything should be processed
-   	// printVector();
 
-   	//verbose.clear(); // Deallocating memory
-    
-    return 0;
+    // Sorting the vector
+    sort(vWords.begin(), vWords.end());
+
+    // By now everything should be processed
+   	printVector();
+   	
+   	vWords.clear(); // Deallocating memory
+
+   	return 0;
 }
 
 /*
