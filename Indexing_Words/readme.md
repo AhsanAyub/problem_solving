@@ -32,23 +32,6 @@ quick 1
 the 1 2
 ```
 
-### Execution
+### Compilation
 
-A step by step series of examples that tell you how to get a development env running
-
-```
-Step 1. Transfer the zip in your machine and uncompress it
-Step 2. command: make coompile
-Step 3. command: make run
-Step 4. command: make clean
-```
-
-### Example
-```.. code-block:: console
-	$ make compile
-	...
-	$ make run
-	....
-	$ make clean
-	...
-```
+Each solution file has the compilation process in its first two lines.

@@ -1,55 +1,37 @@
 /*
  *
  * Compilation:
- * Step 1: g++ -o main vectors.cpp
+ * Step 1: g++ -o main map.cpp
  * Step 2: ./main text.txt
  *
  * @author Md. Ahsan Ayub
- * @version 1.3 03/20/2020 
+ * @version 1.1  03/20/2020 
  *
  */
 
 // Including all the librarires
-#include <vector>
+#include <map>
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iterator>
 
 using namespace std;
 
 // This is the vector variable that will store every info
-vector<string> vCounts;
-vector<string> vWords;
+map<string, string> mIndexWords;
 int iUniqueWord = 0; // Counter for unique words
 
-// This is the utility function to print the vector
-void printVector()
+// This is the utility function to print the map
+void printMap()
 {
-	// Printing the vector
-	for (int i = 0; i < iUniqueWord; i++)
-		cout << vWords.at(i) << endl;
-}
-
-// This is the utility function to check the word and return the index in the vector
-int isAppearedBefore(string sItem)
-{
-	// Iterate through the vector to search the value
-	// Return the index if found; otherwise return -1
-
-	int iVectorSize = vWords.size();
-	int index = 0;
-	while(index < iVectorSize)
+	// Printing the map
+	map<string,string>::iterator iter = mIndexWords.begin();
+	while(iter != mIndexWords.end())
 	{
-		if(sItem.compare(vWords.at(index)) == 0)
-			break; // Appeared before!
-
-		index++;
+		cout << iter->first << " " << iter->second << endl;
+		iter++;
 	}
-
-	if(index == iVectorSize || iVectorSize == 0)
-		return -1; // Not appeared
-	else
-		return index; // Appeared on index
 }
 
 // Parse words given a line found in the file
@@ -63,28 +45,26 @@ int parseWords(string str, int iLine)
 		if(x == ' ')
 		{
 			// Store the word and the line number to the vector as adjacency list
-			int iFlag = isAppearedBefore(sWord);
-			if(iFlag == -1)
+			if (mIndexWords.find(sWord) == mIndexWords.end()) // Not found
 			{
-				// First time appeared; hence, pushing into the vector
-				vWords.push_back(sWord);
-				vCounts.push_back(to_string(iLine+1));
+				// First time appeared; hence, pushing into the map
+				mIndexWords.insert(pair<string, string>(sWord,to_string(iLine+1)));
 				iUniqueWord += 1;
 			}
 			else
 			{
 				int iTemp = -1;
-				int iCountLen = vCounts.at(iFlag).length();
+				int iCountLen = mIndexWords.at(sWord).length();
 				
 				// Getting the final occurred line of the word	
 				if(iCountLen >= 1)
-					iTemp = vCounts.at(iFlag)[iCountLen-1] - '0';
+					iTemp = mIndexWords.at(sWord)[iCountLen-1] - '0';
 
 				// Making sure multiple entries of line numbers do not get stored
 				if(iTemp != iLine+1)
 				{
-					vCounts.at(iFlag) += " ";
-					vCounts.at(iFlag) += to_string(iLine+1);
+					mIndexWords.at(sWord) += " ";
+					mIndexWords.at(sWord) += to_string(iLine+1);
 				}
 			}
 			sWord = "";
@@ -129,22 +109,12 @@ int main (int argc, char *argv[])
     }
     infile.close();	// close the file that was accessed below
 
-    // Merging two vectors into one which will help the sorting operation
-    for (int i = 0; i < iUniqueWord; i++)
-	{
-		vWords.at(i) += " ";
-		vWords.at(i) += vCounts.at(i);
-	}
-	
-	// Sorting the vector
-	sort(vWords.begin(), vWords.end());
-
     // By now everything should be processed
-   	printVector();
+    // Map is by default sorted based on key
+   	printMap();
    	
    	// Deallocating memory
-   	vWords.clear();
-   	vCounts.clear();
+   	mIndexWords.clear();
    	
    	return 0;
 }
