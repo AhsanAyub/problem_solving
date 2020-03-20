@@ -1,4 +1,7 @@
 /*
+ * Compilation:
+ * Step 1: g++ -o main vectors.cpp
+ * Step 2: ./main text.txt
  *
  * @author Md. Ahsan Ayub
  * @version 1.0 11/27/2019 
@@ -14,25 +17,16 @@
 
 using namespace std;
 
-//const int iUniqueWord = 1000; // A bad way, but for the sake of implementation in short time
-
 // This is the vector variable that will store every info
-//vector<string> verbose[iUniqueWord];
-//vector<vector<int>> verbose;
+vector<string> vCounts;
 vector<string> vWords;
 int iUniqueWord = 0; // Counter for unique words
 
 // This is the utility function to print the vector
 void printVector()
 {
-	/*
-		The should be nested loop
-		The parent loop will first be limited to the size of the word list
-		The child loop will be limited to the size of the line count list
-	*/
-	cout << "Printing the vector...\n";
-	int iVectorSize = vWords.size();
-	for (int i = 0; i < iVectorSize; i++)
+	// Printing the vector
+	for (int i = 0; i < iUniqueWord; i++)
 		cout << vWords.at(i) << endl;
 }
 
@@ -47,10 +41,7 @@ int isAppearedBefore(string sItem)
 	while(index < iVectorSize)
 	{
 		if(sItem.compare(vWords.at(index)) == 0)
-		{
-			//cout << "*" << sItem << "* is already found at the vector" << endl;
 			break; // Appeared before!
-		}
 
 		index++;
 	}
@@ -59,33 +50,6 @@ int isAppearedBefore(string sItem)
 		return -1; // Not appeared
 	else
 		return index; // Appeared on index
-}
-
-// This is a utility function to create an adjancency list
-void addLineCount(string str, int i)
-{
-
-	// check whether the word is unique or appeared before in the vector
-	int iCounter = isAppearedBefore(str);
-
-	cout << str << " " << i << endl;
-
-	/*
-	if(!iCounter)
-		verbose[i].push_back(str); // Insert a new word with the occured line
-	
-	
-	else
-		verbose will add the line count in the index returned from the function
-	*/
-	
-	/*
-		What it should do is:
-		"the" -> 0, 1
-		..
-		..
-	*/	
-
 }
 
 // Parse words given a line found in the file
@@ -99,24 +63,35 @@ int parseWords(string str, int iLine)
 		if(x == ' ')
 		{
 			// Store the word and the line number to the vector as adjacency list
-			//addLineCount(sWord, (iLine + 1));
 			int iFlag = isAppearedBefore(sWord);
 			if(iFlag == -1)
 			{
+				// First time appeared; hence, pushing into the vector
 				vWords.push_back(sWord);
+				vCounts.push_back(to_string(iLine+1));
 				iUniqueWord += 1;
 			}
 			else
 			{
-				cout << sWord << " appeared on index: " << iFlag << endl;
+				int iTemp = -1;
+				int iCountLen = vCounts.at(iFlag).length();
+				
+				// Getting the final occurred line of the word	
+				if(iCountLen >= 1)
+					iTemp = vCounts.at(iFlag)[iCountLen-1] - '0';
+
+				// Making sure multiple entries of line numbers do not get stored
+				if(iTemp != iLine+1)
+				{
+					vCounts.at(iFlag) += " ";
+					vCounts.at(iFlag) += to_string(iLine+1);
+				}
 			}
 			sWord = "";
 			iWord = iWord + 1;
 		}
 		else
-		{
 			sWord = sWord + x;
-		}
 	}
 	return (iWord+1);
 }
@@ -130,7 +105,7 @@ int main (int argc, char *argv[])
         return -1;
     }
 
-    string fName = argv[1]; // Storing the file in the variable
+    string fName = argv[1];	// Storing the file in the variable
     ifstream infile;
     infile.open(fName); // Openning the file passed as an argument
 
@@ -147,23 +122,30 @@ int main (int argc, char *argv[])
 
     while(getline(infile, line)) //scan per line
 	{
-		//cout << line << endl;
 		line = line + " "; // a hack to solve the word problem
 		iWord = iWord + parseWords(line, iLine);
-		//cout << parseWords(line) << endl;
 		
     	iLine = iLine + 1;
     }
-    infile.close(); // close the file that was accessed below
+    infile.close();	// close the file that was accessed below
 
-    // Sorting the vector
-    sort(vWords.begin(), vWords.end());
+    // Merging two vectors into one which will help the sorting operation
+    for (int i = 0; i < iUniqueWord; i++)
+	{
+		vWords.at(i) += " ";
+		vWords.at(i) += vCounts.at(i);
+	}
+	
+	// Sorting the vector
+	sort(vWords.begin(), vWords.end());
 
     // By now everything should be processed
    	printVector();
    	
-   	vWords.clear(); // Deallocating memory
-
+   	// Deallocating memory
+   	vWords.clear();
+   	vCounts.clear();
+   	
    	return 0;
 }
 
@@ -194,13 +176,13 @@ int main (int argc, char *argv[])
  
  o/p
  brown 1
- dog 4
+ dog 1
  fox 1
  jumps 1
- lazy 2 3
+ lazy 1
  over 1
  quick 1
- the 1 2
+ the 1
 
  Test Case 3:
  
@@ -218,13 +200,13 @@ int main (int argc, char *argv[])
  dog
  
  o/p
- brown 1
- dog 4
- fox 1
- jumps 1
- lazy 2 3
- over 1
- quick 1
- the 1 2
+ brown 3
+ dog 11
+ fox 4
+ jumps 5
+ lazy 8 9 10
+ over 6
+ quick 2
+ the 1 7
 
 */
