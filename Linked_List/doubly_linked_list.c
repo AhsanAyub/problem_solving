@@ -7,7 +7,7 @@
  * (At the front, in the middle, and at the end),
  * and Traversal (forward and backward).
  *
- * Last Edited on June 6, 2020 22:15:00 (CST)
+ * Last Edited on July 8, 2020 23:54:57 (CST)
  */
 
 #include <stdio.h>
@@ -16,7 +16,7 @@
 // Defination of the list
 typedef struct node
 {
-	int iNumber;	// Value of the node
+	int iNumber;		// Value of the node
 	struct node *next;	// Pointer to point the next node
 	struct node *prev;	// Pointer to point the prev node (the extra one)
 }
@@ -134,6 +134,73 @@ struct node* insertNode(int iValue, struct node* n, enum insertionStatus iStatus
 	return NULL;
 }
 
+// Four ways to insert a node in the list
+enum deletionStatus {
+	deleteAtFront, deleteFromMiddle, deleteAtEnd
+};
+
+//Utility function for Deletion
+struct node* deleteNode(struct node* n, enum deletionStatus dStatus, struct node* node_to_delete)
+{
+	// If the head is null, then the list is empty.
+	if(n == NULL)
+	{
+		printf("The list is null; deletion operation cannot be performed.\n");
+		return n;
+	}
+	// The list is not null, and hence, we can can perform deletion
+	else
+	{
+		if(dStatus == 0)	// Delete the head node; node_to_delete is NULL
+		{
+			node *temp = malloc(sizeof(node)); // Creating a node
+			temp = n;	// Pointing at the head
+			n = n->next;
+			n->prev = NULL;
+			printf("Deleting %d from the list.\n", temp->iNumber);
+			free(temp); // Free the memory
+		}
+		else if(dStatus == 1)	// Delete the node from the middle
+		{
+			printf("Deleting %d from the list.\n", node_to_delete->iNumber);
+			node_to_delete->prev->next = node_to_delete->next;
+			node_to_delete->next->prev = node_to_delete->prev;
+
+			free(node_to_delete); // Free the memory
+		}
+		else if(dStatus == 2)	// Delete the tail node; node_to_delete is NULL
+		{
+			if(n->next == NULL)	// Only one node in the list
+			{
+				printf("Deleting %d from the list.\n", n->iNumber);
+				n = n->next;
+			}
+			else // Multiple node exists
+			{
+				node *tail = malloc(sizeof(node)); // Creating a node to point at the tail
+				node *tail_prev = malloc(sizeof(node)); // Creating a node to point the node before tail
+				tail_prev = n; // pointing at the head node
+				tail = n->next; // pointing at the next node from the head node
+				
+				while(tail->next != NULL) // Iterate thru the list until reaches to the tail
+				{
+					// Iteration steps
+					tail_prev = tail_prev->next;
+					tail = tail->next;
+				}
+
+				tail_prev->next = NULL;	// This is the new tail
+				printf("Deleting %d from the list.\n", tail->iNumber);
+				free(tail); // Free the memory
+			}
+		}
+		else
+			printf("Deletion status is unknown\n");
+
+		return n;
+	}
+}
+
 // Driver program
 int main()
 {
@@ -160,6 +227,24 @@ int main()
 	
 	enum traversalStatus tStatus = forward;
 	printDoublyList(doublyList, tStatus); // Prints forward
+
+	enum deletionStatus dStatus = deleteAtFront;
+	doublyList = deleteNode(doublyList, dStatus, NULL);
+	// The list as of now is 2 -> 1 -> 15 -> 3 -> 20 -> 10 -> null
+	printDoublyList(doublyList, tStatus);	// Prints forward
+
+	dStatus = deleteAtEnd;
+	doublyList = deleteNode(doublyList, dStatus, NULL);
+	// The list as of now is 2 -> 1 -> 15 -> 3 -> 20 -> null
+	printDoublyList(doublyList, tStatus);	// Prints forward
+
+	dStatus = deleteFromMiddle;
+	doublyList = deleteNode(doublyList, dStatus, doublyList->next->next);
+	// The list as of now is 2 -> 1 -> 3 -> 20 -> null
+	printDoublyList(doublyList, tStatus);	// Prints forward
+
+	tStatus = backward;
+	printDoublyList(doublyList, tStatus);	// Prints backward
 
 	// Free list
 	while(doublyList != NULL)
