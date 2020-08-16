@@ -143,8 +143,8 @@ int main()
 	myStack.push(50);
 	myStack.display();
 
-	myStack.pop();
-	myStack.pop();
+	cout << myStack.pop() << " is removed" << endl;
+	cout << myStack.pop() << " is removed" << endl;
 	myStack.display();
 
 	cout << "Top element: " << myStack.peek() << endl;
