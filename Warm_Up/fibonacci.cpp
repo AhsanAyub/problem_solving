@@ -50,18 +50,18 @@ int main(int argc, char* argv[])
     int N = atoi(argv[1]);
 
     // Call the recursive approach
-    auto recursiveApproachStart = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     cout << N << "-th Fibonacci Number (Recusrive Appraoch): " << getFibonacciNthNumberRecursive(N) << endl;
-    auto recursiveApproachStop = std::chrono::high_resolution_clock::now();
-    auto recursiveApproachDuration = std::chrono::duration_cast<std::chrono::microseconds>(recursiveApproachStop - recursiveApproachStart).count();
-    cout << "Duration in miliseconds: " << recursiveApproachDuration << endl;
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
+    cout << "Duration in miliseconds: " << duration << endl;
     
     // Call the list-based approach
-    auto listApproachStart = std::chrono::high_resolution_clock::now();
+    start = std::chrono::high_resolution_clock::now();
     cout << endl << N << "-th Fibonacci Number (List-based Appraoch): " << getFibonacciNthNumber(N) << endl;
-    auto listApproachStop = std::chrono::high_resolution_clock::now();
-    auto listApproachDuration = std::chrono::duration_cast<std::chrono::microseconds>(listApproachStop - listApproachStart).count();
-    cout << "Duration in miliseconds: " << listApproachDuration << endl;
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
+    cout << "Duration in miliseconds: " << duration << endl;
 
     return 0;
 }
